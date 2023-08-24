@@ -8,7 +8,8 @@ from typing import Iterable, Dict
 
 from neo4j import GraphDatabase, Transaction
 
-EDGE_REGEX = re.compile("(\w+)(<-|->)(\w+)")
+NODE_ID_PATTERN = "[a-zA-Z0-9.,\-_ ]+"
+EDGE_REGEX = re.compile(f"({NODE_ID_PATTERN})(<-|->)({NODE_ID_PATTERN})")
 
 try:
     from tqdm import tqdm
