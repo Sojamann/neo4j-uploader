@@ -39,12 +39,22 @@ class Neo4jItem:
         Returns:
             tuple[str, Dict]: the query string with its query parameters
         """
+        
+        # when creating a node with an empty property value e.g. 
+        # 'CREATE (n: LABEL { prop: null })' neo4j wont store
+        # the property of the node since it has no value.
+        # When trying to later find the node, we therefore have to exclude
+        # the key, value pair from the properties, otherwise we cannot
+        # find the node again using e.g.
+        # MATCH (n: {prop: null}) since this key value pair is not present
+        # on any node/edge.
+        properties = {k: v for k, v in self.properties.items() if v is not None}
+
         start = f"{identifier}: {self.label} "
-
-        mid = "{" + ", ".join(f"{k}: ${identifier}_{k}" for k in self.properties) + "}"
-
+        mid = "{" + ", ".join(f"{k}: ${identifier}_{k}" for k in properties) + "}"
         query_str = self.OPENING + start + mid + self.CLOSING
-        return query_str, {f"{identifier}_{k}": v for k, v in self.properties.items()}
+
+        return query_str, {f"{identifier}_{k}": v for k, v in properties.items()}
 
 @dataclass
 class Node(Neo4jItem):
