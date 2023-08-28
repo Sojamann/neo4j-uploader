@@ -72,6 +72,6 @@ docker run -d \
 
 ### Executig The Script
 ```SH
-./upload.py -h localhost -p 7687 -u neo4j -pw password -f ./graph.json
+./upload.py --host localhost -p 7687 -u neo4j -pw password -f ./graph.json
 ```
 
