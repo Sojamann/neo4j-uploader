@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass, field
 from typing import Iterable, Dict
 
-from neo4j import GraphDatabase, Transaction
+from neo4j import GraphDatabase, Transaction, TrustSystemCAs
 
 NODE_ID_PATTERN = "[a-zA-Z0-9.,\-_ ]+"
 EDGE_REGEX = re.compile(f"({NODE_ID_PATTERN})(<-|->)({NODE_ID_PATTERN})")
@@ -161,6 +161,7 @@ def main():
     parser.add_argument("-pw", "--password",               type=str, required=True)
     parser.add_argument("-d",  "--database",               type=str, default="neo4j")
     parser.add_argument("-f",  "--file",                   type=FileType("r"), required=True)
+    parser.add_argument(       "--non-encrypted",          dest="encrypted", action="store_false")
     parser.add_argument(       "--no-prior-clear",         dest="clear", action="store_false")
 
     args = parser.parse_args()
@@ -172,7 +173,13 @@ def main():
 
     uri = f"neo4j://{args.host}:{args.port}"
     auth = (args.user, args.password)
-    with GraphDatabase.driver(uri, auth=auth) as driver:
+    driver = GraphDatabase.driver(
+        uri,
+        auth=auth,
+        encrypted=args.encrypted,
+        trusted_certificates=TrustSystemCAs(),
+    )
+    with driver as driver:
         with driver.session(database=args.database) as sess:
             tx = sess.begin_transaction()
 
