@@ -56,6 +56,7 @@ options:
   -d DATABASE, --database DATABASE      The database to connect to ... defaults to 'neo4j'
   -f FILE, --file FILE                  The json file with the graph description
   --no-prior-clear                      Do not clear the neo4j database prior to creating the graph
+  --non-encrypted                       Tell the neo4j driver to not encrypt the data
 
 ```
 
